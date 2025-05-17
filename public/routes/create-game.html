@@ -1,0 +1,36 @@
+<!-- TEMPORARY PAGE -->
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Game</title>
+</head>
+
+<body>
+  <h1>Create game</h1>
+  <form action="/create-game" method="post">
+    <p id="range-value">3</p>
+    <input id="range-slider" type="range" name="players" value="3" min="3" max="8">
+    <br>
+    <label>
+      <input type="radio" name="private" value="true" checked>
+      Private game
+    </label>
+    <br>
+    <label>
+      <input type="radio" name="private" value="false">
+      Public game
+    </label>
+    <br>
+    <input type="text" name="name" placeholder="Enter a username" maxlength="50" value="admin" required>
+    <br>
+    <button type="submit">Submit!</button>
+  </form>
+
+  <script src="/static/scripts/form.js"></script>
+
+</body>
+
+</html>
