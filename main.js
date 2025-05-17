@@ -1,5 +1,7 @@
-import { serveDir, serveFile } from "@std/http";
+import { serveDir, serveFile, setCookie } from "@std/http";
 import { ulid } from "@std/ulid";
+
+const GAME_ROUTE = new URLPattern({ pathname: "/game/:id" });
 
 Deno.serve(async (req) => {
   const url = new URL(req.url);
@@ -22,18 +24,21 @@ Deno.serve(async (req) => {
       null,
       "\t",
     );
-    // await writer.write(new TextEncoder().encode(`
-    // {
-    //   "id": "${id}",
-    //   "status": "waiting",
-    //   "privacy": "${data.get("private")}",
-    //   "player_count": "${data.get("players")}",
-    //   "creation-date": "${Date.now()}",
-    //   "players": []
-    // }
-    // `.trim()));
     await writer.write(new TextEncoder().encode(game));
-    return Response.redirect(req.url, 303);
+
+    const headers = new Headers();
+    setCookie(headers, {
+      name: "username",
+      value: data.get("username"),
+    });
+
+    const url = new URL(`/game/${id}`, req.url);
+
+    return Response.redirect(url, 303);
+  }
+
+  if (GAME_ROUTE.exec(req.url)) {
+    return serveFile(req, "./public/routes/game.html");
   }
 
   // TEMPORARY PATH
@@ -43,6 +48,19 @@ Deno.serve(async (req) => {
 
   if (pathname == "/") {
     return serveFile(req, "./public/routes/index.html");
+  }
+
+  if (pathname == "/get-game") {
+    const game = url.searchParams.get("game");
+
+    try {
+      const data = await Deno.readTextFile(`./games/${game}.json`);
+      return new Response(data);
+    } catch (_) {
+      return new Response(JSON.stringify({
+        status: "not found"
+      }));
+    }
   }
 
   if (pathname.startsWith("/static")) {
