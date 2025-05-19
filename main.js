@@ -33,8 +33,12 @@ Deno.serve(async (req) => {
     });
 
     const url = new URL(`/game/${id}`, req.url);
+    headers.set("Location", url.toString());
 
-    return Response.redirect(url, 303);
+    return new Response(null, {
+      status: 303,
+      headers: headers,
+    });
   }
 
   if (GAME_ROUTE.exec(req.url)) {
@@ -58,7 +62,7 @@ Deno.serve(async (req) => {
       return new Response(data);
     } catch (_) {
       return new Response(JSON.stringify({
-        status: "not found"
+        status: "not found",
       }));
     }
   }
